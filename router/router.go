@@ -16,6 +16,14 @@ func SetupRoutes(app *fiber.App) {
 	auth.Post("/register", controller.Register)
 
 	// Tasks
-	tasks := api.Group("/tasks")
-	tasks.Post("/", middleware.JWTAuthorization, controller.CreateTask)
+	task := api.Group("/tasks")
+	task.Get("/", controller.GetTasks)
+	task.Get("/:id", controller.GetTask)
+
+	// Task with authorization
+	task.Use(middleware.JWTAuthorization)
+	task.Post("/", controller.CreateTask)
+	task.Patch("/:id", controller.UpdateTask)
+	task.Patch("/:id/done", controller.UpdateDoneTask)
+	task.Delete("/:id", controller.DeleteTask)
 }

@@ -37,7 +37,6 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	response := database.DB.Create(&user)
-
 	if response.Error != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": response.Error.Error(),

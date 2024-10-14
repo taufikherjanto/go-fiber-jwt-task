@@ -28,6 +28,12 @@ func JWTAuthorization(c *fiber.Ctx) error {
 		ContextKey: "jwt",
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			// Failed authentication return status 401
+			if err.Error() == "Missing or malformed JWT" {
+				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+					"error":   true,
+					"message": err.Error(),
+				})
+			}
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error":   true,
 				"message": err.Error(),

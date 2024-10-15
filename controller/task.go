@@ -3,6 +3,7 @@ package controller
 import (
 	"go-fiber-jwt-task/database"
 	"go-fiber-jwt-task/model"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,7 +19,7 @@ type updateDoneRequest struct {
 
 func GetTasks(c *fiber.Ctx) error {
 	var tasks []model.Task
-	database.DB.Find(&tasks)
+	database.DB.Order("id").Find(&tasks)
 	return c.JSON(tasks)
 }
 
@@ -66,6 +67,8 @@ func UpdateTask(c *fiber.Ctx) error {
 		})
 	}
 
+	log.Println("task: ", task)
+
 	id := c.Params("id")
 	var dataTask model.Task
 	database.DB.Find(&dataTask, id)
@@ -87,6 +90,8 @@ func UpdateDoneTask(c *fiber.Ctx) error {
 		})
 	}
 
+	log.Println("task: ", task.Done)
+
 	id := c.Params("id")
 	var dataTask model.Task
 	database.DB.Find(&dataTask, id)
@@ -96,7 +101,8 @@ func UpdateDoneTask(c *fiber.Ctx) error {
 		})
 	}
 
-	database.DB.Model(&dataTask).Updates(task)
+	// use exec for update bool value
+	database.DB.Exec("UPDATE Tasks SET done = ? WHERE id = ?", task.Done, id)
 	return c.JSON(task)
 }
 

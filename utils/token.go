@@ -1,37 +1,56 @@
 package utils
 
 import (
-	"go-fiber-jwt-task/model"
+	"fmt"
 	"os"
 	"time"
+
+	"go-fiber-jwt-task/model"
 
 	"github.com/golang-jwt/jwt"
 )
 
+// GenerateToken membuat token JWT baru untuk pengguna yang ditentukan.
 func GenerateToken(user model.User) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id":  user.ID,
-		"email":    user.Email,
-		"issed_at": time.Now(),
-		"exp":      time.Now().Add(time.Hour * 24),
-	})
-
-	t, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-	if err != nil {
-		return "", err
+	// Mengambil rahasia JWT dari variabel lingkungan.
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		return "", fmt.Errorf("JWT_SECRET tidak diset")
 	}
 
-	return t, nil
+	// Membuat token JWT baru dengan klaim yang mencakup ID dan email pengguna.
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id":   user.ID,
+		"email":     user.Email,
+		"issued_at": time.Now().Unix(),
+		"exp":       time.Now().Add(time.Hour * 24).Unix(), // Menetapkan kedaluwarsa token selama 24 jam
+	})
+
+	// Menandatangani token menggunakan rahasia dan mengembalikannya.
+	return token.SignedString([]byte(jwtSecret))
 }
 
-func VerifyToken(tokenString string) (bool, error) {
+// VerifyToken memeriksa apakah token yang diberikan valid dan mengembalikan klaim.
+func VerifyToken(tokenString string) (jwt.MapClaims, error) {
+	// Mengambil rahasia JWT dari variabel lingkungan.
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		return nil, fmt.Errorf("JWT_SECRET tidak diset")
+	}
+
+	// Mem-parse token dan memvalidasikannya terhadap rahasia.
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("JWT_SECRET")), nil
+		return []byte(jwtSecret), nil
 	})
 
 	if err != nil {
-		return false, err
+		return nil, err // Mengembalikan kesalahan yang terjadi selama parsing
 	}
 
-	return token.Valid, nil
+	// Memeriksa apakah klaim token valid dan mengembalikannya.
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims, nil
+	}
+
+	return nil, fmt.Errorf("token tidak valid")
 }

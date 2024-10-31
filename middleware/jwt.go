@@ -1,46 +1,35 @@
 package middleware
 
 import (
-	"os"
+	"strings"
 
-	jwtware "github.com/gofiber/contrib/jwt"
+	"go-fiber-jwt-task/utils"
+
 	"github.com/gofiber/fiber/v2"
 )
 
+// JWTAuthorization middleware memeriksa keabsahan token JWT.
 func JWTAuthorization(c *fiber.Ctx) error {
-	/*
-		return jwtware.New(jwtware.Config{
-			SigningKey: jwtware.SigningKey{Key: []byte(os.Getenv("JWT_SECRET"))},
-			ContextKey: "jwt",
-			ErrorHandler: func(c *fiber.Ctx, err error) error {
-				// Failed authentication return status 401
-				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-					"error":   true,
-					"message": err.Error(),
-				})
-			},
-		})(c)
-	*/
-
-	// simple version readable
-	config := jwtware.Config{
-		SigningKey: jwtware.SigningKey{Key: []byte(os.Getenv("JWT_SECRET"))},
-		ContextKey: "jwt",
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			// Failed authentication return status 401
-			if err.Error() == "Missing or malformed JWT" {
-				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-					"error":   true,
-					"message": err.Error(),
-				})
-			}
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error":   true,
-				"message": err.Error(),
-			})
-		},
+	// Mengambil header Authorization dari permintaan.
+	tokenString := c.Get("Authorization")
+	if tokenString == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": true, "message": "JWT hilang atau tidak valid"})
 	}
 
-	return jwtware.New(config)(c)
+	// Memastikan format token benar (Bearer token).
+	if strings.HasPrefix(tokenString, "Bearer ") {
+		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+	} else {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": true, "message": "Format Authorization tidak valid"})
+	}
 
+	// Memverifikasi token dan mengekstrak klaim.
+	claims, err := utils.VerifyToken(tokenString)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": true, "message": "Token tidak valid atau telah kedaluwarsa"})
+	}
+
+	// Menyimpan klaim dalam konteks untuk digunakan di handler selanjutnya.
+	c.Locals("jwt", claims)
+	return c.Next() // Melanjutkan ke handler berikutnya jika token valid.
 }

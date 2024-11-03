@@ -5,6 +5,7 @@ import (
 	"go-fiber-jwt-task/database"
 	"go-fiber-jwt-task/model"
 	"go-fiber-jwt-task/utils"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
@@ -115,7 +116,38 @@ func findUserByEmail(email string) (model.User, error) {
 	return user, nil
 }
 
-// Logout menangani logout pengguna. Saat ini, hanya mengkonfirmasi logout.
+// Penanganan ketika user logout
 func Logout(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": "Berhasil keluar"})
+	// Get token from Authorization header
+	tokenString := c.Get("Authorization")
+	if tokenString == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error":   true,
+			"message": "Missing or malformed JWT",
+		})
+	}
+
+	// Memisahkan token dari kata "Bearer"
+	if strings.HasPrefix(tokenString, "Bearer ") {
+		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+	} else {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error":   true,
+			"message": "Invalid Authorization format",
+		})
+	}
+
+	// Simpan token yang dibatalkan ke dalam basis data
+	revokedToken := model.RevokedToken{Token: tokenString}
+	if err := database.DB.Create(&revokedToken).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error":   true,
+			"message": "Failed to revoke token",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"message": "Successfully logged out",
+	})
 }

@@ -7,7 +7,7 @@ type User struct {
 }
 
 // authenticationRequest mendefinisikan struktur permintaan untuk pendaftaran dan login.
-type authenticationRequest struct {
+type AuthenticationRequest struct {
 	Email    string `json:"email" validate:"required,email"`    // Email harus berupa format email yang valid
 	Password string `json:"password" validate:"required,min=6"` // Password harus memiliki panjang minimal 6 karakter
 }

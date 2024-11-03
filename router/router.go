@@ -16,6 +16,7 @@ func SetupRoutes(app *fiber.App) {
 	auth.Post("/login", controller.Login)                                      // Rute untuk login pengguna
 	auth.Post("/register", controller.Register)                                // Rute untuk pendaftaran pengguna
 	auth.Get("/userinfo", middleware.JWTAuthorization, controller.GetUserInfo) // Rute info pengguna yang dilindungi
+	auth.Get("/logout", middleware.JWTAuthorization, controller.Logout)   // Rute info pengguna yang dilindungi
 
 	// Rute Tugas
 	task := api.Group("/tasks")          // Grup untuk rute terkait tugas

@@ -32,7 +32,7 @@ func Connect() {
 	fmt.Println("Success connect to DB")
 
 	//Run migration DB
-	err = DB.AutoMigrate(&model.Task{}, &model.User{})
+	err = DB.AutoMigrate(&model.Task{}, &model.User{}, &model.RevokedToken{})
 	if err != nil {
 		panic("Failed to run migration DB")
 	}

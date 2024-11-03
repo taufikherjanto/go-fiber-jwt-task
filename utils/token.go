@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"go-fiber-jwt-task/model"
@@ -38,13 +39,17 @@ func VerifyToken(tokenString string) (jwt.MapClaims, error) {
 		return nil, fmt.Errorf("JWT_SECRET tidak diset")
 	}
 
-	// Mem-parse token dan memvalidasikannya terhadap rahasia.
+	// Menghapus prefix "Bearer " tanpa if statement.
+	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+
+	// Mem-parsing dan memverifikasi token.
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtSecret), nil
 	})
 
+	// Mengembalikan kesalahan jika terjadi error selama parsing.
 	if err != nil {
-		return nil, err // Mengembalikan kesalahan yang terjadi selama parsing
+		return nil, err
 	}
 
 	// Memeriksa apakah klaim token valid dan mengembalikannya.

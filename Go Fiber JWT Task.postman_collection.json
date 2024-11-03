@@ -33,14 +33,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/tasks/4",
+							"raw": "{{host}}/api/tasks/1",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"api",
 								"tasks",
-								"4"
+								"1"
 							]
 						}
 					},
@@ -63,7 +63,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"Tambahkan endpoint Task\",\r\n    \"description\": \"Untuk CRUD Task\"\r\n}",
+							"raw": "{\r\n    \"title\": \"Test Expired Token jWT\",\r\n    \"description\": \"Test expired access token\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -100,7 +100,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"Tambahkan endpoint Task\",\r\n    \"description\": \"Untuk CRUD Task\"\r\n}",
+							"raw": "{\r\n    \"title\": \"Tambahkan endpoint Taskku\",\r\n    \"description\": \"Untuk CRUD Taskku\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -138,7 +138,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"done\": false\r\n}",
+							"raw": "{\r\n    \"done\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -163,6 +163,16 @@
 				{
 					"name": "Delete Task",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJodW1hbkBtYWlsLmNvbSIsImV4cCI6MTczMDcyMzE5NSwiaXNzdWVkX2F0IjoxNzMwNjM2Nzk1LCJ1c2VyX2lkIjo2fQ.bH_96BIyA6MZhhT_9Qux3apvcgak2xzYs8QdMFgqm5g",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
@@ -213,6 +223,47 @@
 					"response": []
 				},
 				{
+					"name": "User Info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJodW1hbkBtYWlsLmNvbSIsImV4cCI6MTczMDcyMzE5NSwiaXNzdWVkX2F0IjoxNzMwNjM2Nzk1LCJ1c2VyX2lkIjo2fQ.bH_96BIyA6MZhhT_9Qux3apvcgak2xzYs8QdMFgqm5g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"user human\",\r\n    \"email\": \"userhuman@mail.com\",\r\n    \"password\": \"secretpassword\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/auth/userinfo",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"userinfo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Login User",
 					"request": {
 						"method": "POST",
@@ -235,6 +286,47 @@
 								"api",
 								"auth",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJodW1hbkBtYWlsLmNvbSIsImV4cCI6MTczMDcyMzE5NSwiaXNzdWVkX2F0IjoxNzMwNjM2Nzk1LCJ1c2VyX2lkIjo2fQ.bH_96BIyA6MZhhT_9Qux3apvcgak2xzYs8QdMFgqm5g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"userhuman@mail.com\",\r\n    \"password\": \"secretpassword\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/auth/logout",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
 							]
 						}
 					},
